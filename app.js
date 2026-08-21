@@ -138,6 +138,7 @@
     el.className = "card r-" + s.rarity + " lvl" + lvl + (lvl === MAX_LEVEL ? " mastered" : "");
     el.style.setProperty("--rc", themeOf(s));   // theme color drives bg, top bar, glow, pips
     el.dataset.id = s.id;
+    if (s.ability) { el.dataset.ability = s.ability; el.dataset.spriteName = s.name; }
 
     /* thumb */
     var thumb = document.createElement("div"); thumb.className = "thumb";
@@ -453,6 +454,49 @@
     toastTimer = setTimeout(function () { t.className = "toast"; }, 2600);
   }
 
+  /* ---------- ability tooltip (hover) ---------- */
+  var tipEl, tipCard = null;
+  function initTooltip() {
+    tipEl = document.createElement("div");
+    tipEl.className = "sprite-tip";
+    tipEl.innerHTML = '<span class="tip-name"></span><span class="tip-ability"></span>';
+    document.body.appendChild(tipEl);
+
+    grid.addEventListener("mouseover", function (e) {
+      var card = e.target.closest(".card");
+      if (!card || card === tipCard || !card.dataset.ability) return;
+      tipCard = card;
+      showTip(card);
+    });
+    grid.addEventListener("mouseout", function (e) {
+      var card = e.target.closest(".card");
+      if (!card) return;
+      if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+      tipCard = null; hideTip();
+    });
+    // stale position on scroll/resize -> just hide
+    window.addEventListener("scroll", hideTip, { passive: true });
+    window.addEventListener("resize", hideTip);
+  }
+  function showTip(card) {
+    tipEl.querySelector(".tip-name").textContent = card.dataset.spriteName || "";
+    tipEl.querySelector(".tip-ability").textContent = card.dataset.ability || "";
+    tipEl.classList.remove("below");
+    tipEl.style.visibility = "hidden";
+    tipEl.classList.add("show");
+    // measure then position
+    var r = card.getBoundingClientRect();
+    var tr = tipEl.getBoundingClientRect();
+    var left = r.left + r.width / 2 - tr.width / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+    var top = r.top - tr.height - 10;
+    if (top < 8) { top = r.bottom + 10; tipEl.classList.add("below"); }
+    tipEl.style.left = left + "px";
+    tipEl.style.top = top + "px";
+    tipEl.style.visibility = "visible";
+  }
+  function hideTip() { if (tipEl) { tipEl.classList.remove("show"); tipCard = null; } }
+
   /* ---------- boot ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     if (!SPRITES.length) {
@@ -461,6 +505,7 @@
     }
     initToolbar();
     initModal();
+    initTooltip();
     render();
   });
 })();

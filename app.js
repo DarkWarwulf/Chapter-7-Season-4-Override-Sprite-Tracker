@@ -16,7 +16,9 @@
     rare: "#104273", epic: "#4d1566", legendary: "#743e0a", mythic: "#a89442",
     gold: "#9d752a", candy: "#9f4540", galaxy: "#463b9e", gem: "#7098a3",
     holofoil: "#a1428e", cube: "#730974", quack: "#6941a2",
-    cheatmaster: "#32650b"   // Ch7 S4 Override "Cheat Master" variant (green)
+    cheatmaster: "#32650b", // Ch7 S4 "Cheat Master" (green)
+    hacker: "#7a2fb5",      // Ch7 S4 "Loot Hacker" (violet)
+    reaper: "#b02a5e"       // Ch7 S4 "Bounty Hunter" (crimson-magenta)
   };
   function themeOf(s) {
     var key = s.variant === "base" ? s.rarity : s.variant;
